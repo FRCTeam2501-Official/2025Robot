@@ -4,64 +4,42 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
-  private final Drive m_Drive = new Drive();
-  // private final Joystick controller1 = new Joystick(0);
-  // JoystickButton button1 = new JoystickButton(controller1, 1);
-  // JoystickButton button3 = new JoystickButton(controller1, 2);
+  private final Swerve s_Swerve = new Swerve();
   CommandXboxController driverController = new CommandXboxController(0);
-  // XboxController XBOXTHING = new XboxController(0); // 0 is the USB Port to be
-  // used as indicated on the Driver Station
 
   public RobotContainer() {
     configureBindings();
-
   }
 
   private void configureBindings() {
 
-    // button1.onTrue(new MotorGo(m_Drive));//can also be onFalse
-    // button1.whileTrue(new StartEndCommand(() -> m_Drive.motorSpin(.5), () ->
-    // m_Drive.motorSpin(0), m_Drive));
-    // button1.onFalse(new RunCommand(() -> m_Drive.printAThing("NoThing"),
-    // m_Drive));
+    driverController.a().whileTrue(new RunCommand(() -> s_Swerve.motorSpin(.2),s_Swerve));
+    driverController.a().whileFalse(new RunCommand(() -> s_Swerve.motorStop(),s_Swerve));
 
-    // InstantCommand runMotorCommand = new InstantCommand(() -> {
-    // m_Drive.motorSpin(.5);
-    // });
+    driverController.b().whileTrue(new RunCommand(() -> s_Swerve.FRTest()));
+    driverController.b().whileFalse(new RunCommand(() -> s_Swerve.motorStop()));
 
-    // InstantCommand stopMotorCommand = new InstantCommand(() -> {
-    // m_Drive.motorSpin(0);
-    // });
+    driverController.y().whileTrue(new RunCommand(() -> s_Swerve.FRTest2()));
+    driverController.y().whileFalse(new RunCommand(() -> s_Swerve.motorStop()));
 
-    // button1.onTrue(new SequentialCommandGroup(runMotorCommand, new
-    // WaitCommand(5), stopMotorCommand));
-    // double controller1Y = controller1.getRawAxis(1);
-    // System.out.println(controller1Y);
+    driverController.x().whileTrue(new RunCommand(() -> s_Swerve.ResetEncoders1()));
+    // driverController.leftBumper().whileTrue(new RunCommand(() -> s_Swerve.shooterGo(0)));
 
-    // double controller1X = controller1.getRawAxis(0);
-    // System.out.println(controller1X);
-    //
 
-    // button1.whileTrue(new joystickYPrint(controller1.getRawAxis(0),
-    // controller1.getRawAxis(1)));
-    // driverController.a().whileTrue(new RunCommand(() ->
-    // m_Drive.printAThing(driverController.getLeftY()), m_Drive));
-    double YVlaue = -driverController.getLeftY();
-    m_Drive.setDefaultCommand(new RunCommand(() -> m_Drive.printAThing(-driverController.getLeftY()), m_Drive));
-    driverController.a().whileTrue(new RunCommand(() -> m_Drive.shooterGo(), m_Drive));
-    driverController.a().whileFalse(new RunCommand(() -> m_Drive.shooterNoGo(), m_Drive));
-    
-    driverController.b().whileTrue(new RunCommand(() -> m_Drive.climberUp(), m_Drive));
-    driverController.b().whileFalse(new RunCommand(() -> m_Drive.climberStop(), m_Drive));
+driverController.axisMagnitudeGreaterThan(0,0.03).whileTrue(new RunCommand(() -> s_Swerve.SwerveSequence(driverController.getLeftX(),driverController.getLeftY())));
+driverController.axisMagnitudeGreaterThan(0,0.03).whileFalse(new RunCommand(() -> s_Swerve.motorStop()));
 
-    driverController.y().whileTrue(new RunCommand(() -> m_Drive.climberDown(), m_Drive));
-    driverController.y().whileFalse(new RunCommand(() -> m_Drive.climberStop(), m_Drive));
+
+
+
+
   }
 
   public Command getAutonomousCommand() {
