@@ -16,11 +16,16 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
-
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 
 public class Swerve extends SubsystemBase {
   /** Creates a new Swerve. */
@@ -42,10 +47,36 @@ public class Swerve extends SubsystemBase {
   //  private final SparkMaxConfig shooterUpper_config = new SparkMaxConfig();
   // SparkClosedLoopController shooterUpper_pid;
 
+// pigeon 2 29
+// 25 BR, 26 Bl, 27 FR, 28 FL
 
-  // CoreCANcoder m_CaNcoder = new CoreCANcoder(27);
-  //final CANcoder m_CANCoder = new CANcoder(27);
-  //private final CANcoder cancodernumber1 = new CANcoder(26);
+CANcoder m_cancoderFrontRight = new CANcoder(27);
+CANcoder m_cancoderFrontLeft = new CANcoder(28);
+CANcoder m_cancoderBackLeft = new CANcoder(26);
+CANcoder m_cancoderBackRight = new CANcoder(25);
+
+
+public void CANCoderAngle(){
+
+StatusSignal<Angle> canCoderFrontRightAngle = m_cancoderFrontRight.getPosition();
+StatusSignal<Angle> canCoderFrontLeftAngle = m_cancoderFrontLeft.getPosition();
+StatusSignal<Angle> canCoderBackLeftAngle = m_cancoderBackLeft.getPosition();
+StatusSignal<Angle> canCoderBackRightAngle = m_cancoderBackRight.getPosition();
+
+//.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinus180;
+
+SmartDashboard.putNumber("Front Right Angle", canCoderFrontRightAngle.getValueAsDouble()*1100/Math.PI);
+SmartDashboard.putNumber("Front Left Angle", canCoderFrontLeftAngle.getValueAsDouble()*180/Math.PI);
+SmartDashboard.putNumber("Back Right Angle", canCoderBackRightAngle.getValueAsDouble()*180/Math.PI);
+SmartDashboard.putNumber("Back Right Angle", canCoderBackLeftAngle.getValueAsDouble()*180/Math.PI);
+
+
+}
+
+  //CoreCANcoder m_CaNcoder = new CoreCANcoder(27);
+  // final CANcoder m_CANCoder = new CANcoder(27);
+  // private final CANcoder cancodernumber1 = new CANcoder(26);
+
   // final WPI_CANCoder m_cancoder = new WPI_CANCoder(27);
   // final CANCoderConfiguration m_cancoderConfig = new CANCoderConfiguration();
 
@@ -159,10 +190,10 @@ public void SwerveTurn(double Angle){ //swervespin
   double spinAngle3 = backLeftTurnEncoder.getPosition();
   double spinAngle4 = backRightTurnEncoder.getPosition();
 
-  SmartDashboard.putNumber("Front Left Angle", spinAngle1);
-  SmartDashboard.putNumber("Front Right Angle", spinAngle2);
-  SmartDashboard.putNumber("Back Left Angle", spinAngle3);
-  SmartDashboard.putNumber("Back Right Angle", spinAngle4);
+  // SmartDashboard.putNumber("Front Left Angle", spinAngle1);
+  // SmartDashboard.putNumber("Front Right Angle", spinAngle2);
+  // SmartDashboard.putNumber("Back Left Angle", spinAngle3);
+  // SmartDashboard.putNumber("Back Right Angle", spinAngle4);
 
   //double SwervePosition = m_CANCoder.getPosition();
   //StatusSignal<Angle> swerveAngle = number1s();
@@ -193,7 +224,7 @@ if(AngleOffset <= spinAngle3 ) BLTurn.set(-.1);
 if(AngleOffset >= spinAngle4 ) BRTurn.set(.1);
 if(AngleOffset <= spinAngle4 ) BRTurn.set(-.1);
 
-//shooterGo(SwerveSetPoint , spinAngle2);
+shooterGo(SwerveSetPoint , spinAngle2);
 }
 
 public void shooterGo(double joystickangle, double FrontRightAngle) {
